@@ -1,5 +1,7 @@
+require 'json'
 module Example
   def self.get_something
-    "Hello Dude!"
+    content_type :json
+    { :result => 'success', :params => params }.to_json
   end
 end
