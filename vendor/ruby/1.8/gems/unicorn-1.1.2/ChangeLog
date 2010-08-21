@@ -1,0 +1,352 @@
+ChangeLog from git://git.bogomips.org/unicorn.git (v1.0.0..v1.1.2)
+
+    commit d1818d26b0ca491dac861f3c2d9e249b665269a4
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 13:01:55 2010 -0700
+    
+        unicorn 1.1.2 - fixing upgrade rollbacks
+        
+        This release is fixes a long-standing bug where the original PID
+        file is not restored when rolling back from a USR2 upgrade.
+        Presumably most upgrades aren't rolled back, so it took over a
+        year to notice this issue.  Thanks to Lawrence Pit for
+        discovering and reporting this issue.
+    
+    commit 43b308c53b5e9fa74d3f52de75fc14cf327851bf
+    Merge: 883e76b a965c0b
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 13:03:57 2010 -0700
+    
+        Merge commit 'v1.0.1' into 1.1.x-stable
+        
+        * commit 'v1.0.1':
+          unicorn 1.0.1 - bugfixes only
+          SIGHUP deals w/ dual master pid path scenario
+          launcher: do not re-daemonize when USR2 upgrading
+          tee_input: safer record separator ($/) handling
+    
+    commit a965c0bb48d5b92373f939865212641d810c97d7
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 12:54:26 2010 -0700
+    
+        unicorn 1.0.1 - bugfixes only
+        
+        The first maintenance release of 1.0.x, this release is
+        primarily to fix a long-standing bug where the original PID file
+        is not restored when rolling back from a USR2 upgrade.
+        Presumably most upgrades aren't rolled back, so it took over a
+        year to notice this issue.  Thanks to Lawrence Pit for
+        discovering and reporting this issue.
+        
+        There is also a pedantic TeeInput bugfix which shouldn't affect
+        real apps from the 1.1.x series and a test case fix for OSX,
+        too.
+    
+    commit 2a8c4bea2c39d0a551feb79cb471171cf96a55db
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 08:57:37 2010 +0000
+    
+        SIGHUP deals w/ dual master pid path scenario
+        
+        As described in our SIGNALS documentation, sending SIGHUP to the
+        old master (to respawn SIGWINCH-ed children) while the new
+        master (spawned from SIGUSR2) is active is useful for backing
+        out of an upgrade before sending SIGQUIT to the new master.
+        
+        Unfortunately, the SIGHUP signal to the old master will cause
+        the ".oldbin" pid file to be reset to the non-".oldbin" version
+        and thus attempt to clobber the pid file in use by the
+        to-be-terminated new master process.
+        
+        Thanks to the previous commit to prevent redaemonization in the
+        new master, the old master can reliably detect if the new master
+        is active while it is reloading the config file.
+        
+        Thanks to Lawrence Pit for discovering this bug.
+        ref: http://mid.gmane.org/4C3BEACF.7040301@gmail.com
+        (cherry picked from commit c13bec3449396b21795966101367838161612d61)
+    
+    commit ae1f5e2d331d1714dd1b71d4905b296abf7780d0
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 08:53:48 2010 +0000
+    
+        launcher: do not re-daemonize when USR2 upgrading
+        
+        This was accidentally enabled when ready_pipe was developed.
+        While re-daemonizing appears harmless in most cases this makes
+        detecting backed-out upgrades from the original master process
+        impossible.
+        (cherry picked from commit 3f0f9d6d72cf17b34c130b86eb933bbc513b24b3)
+    
+    commit 883e76b12d6034e5750d662c9e4f453888dbd154
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 08:57:37 2010 +0000
+    
+        SIGHUP deals w/ dual master pid path scenario
+        
+        As described in our SIGNALS documentation, sending SIGHUP to the
+        old master (to respawn SIGWINCH-ed children) while the new
+        master (spawned from SIGUSR2) is active is useful for backing
+        out of an upgrade before sending SIGQUIT to the new master.
+        
+        Unfortunately, the SIGHUP signal to the old master will cause
+        the ".oldbin" pid file to be reset to the non-".oldbin" version
+        and thus attempt to clobber the pid file in use by the
+        to-be-terminated new master process.
+        
+        Thanks to the previous commit to prevent redaemonization in the
+        new master, the old master can reliably detect if the new master
+        is active while it is reloading the config file.
+        
+        Thanks to Lawrence Pit for discovering this bug.
+        ref: http://mid.gmane.org/4C3BEACF.7040301@gmail.com
+        (cherry picked from commit c13bec3449396b21795966101367838161612d61)
+    
+    commit 430c8cc9f8b5f1db9395531df4ebab655da5d958
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 13 08:53:48 2010 +0000
+    
+        launcher: do not re-daemonize when USR2 upgrading
+        
+        This was accidentally enabled when ready_pipe was developed.
+        While re-daemonizing appears harmless in most cases this makes
+        detecting backed-out upgrades from the original master process
+        impossible.
+        (cherry picked from commit 3f0f9d6d72cf17b34c130b86eb933bbc513b24b3)
+    
+    commit a055dcd9e15ed93c9bbd0d83b2f87c96a4733cfb
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Sun Jul 11 02:10:54 2010 +0000
+    
+        unicorn 1.1.1 - fixing cleanups gone bad :x
+        
+        Unicorn::TeeInput constant resolution for Unicorn::ClientError
+        got broken simplifying code for RDoc.  This affects users
+        of Rainbows! and Zbatery.
+    
+    commit 454a81378bf88dccb081b2cd7e7126a66a92f013
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Sun Jul 11 02:05:01 2010 +0000
+    
+        tee_input: fix constant resolution for client EOF
+        
+        Noticed while hacking on a Zbatery-using application
+        (cherry picked from commit ac15513bb81a345cd12c67702a81a585b8b0514e)
+    
+    commit 36ab744c7b79c47ca3d03fcf0f90eb3b8bba9b07
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jul 8 07:31:15 2010 +0000
+    
+        unicorn 1.1.0 - small changes and cleanups
+        
+        This is a small, incremental feature release with some internal
+        changes to better support upcoming versions of the Rainbows! and
+        Zbatery web servers.  There is no need to upgrade if you're
+        happy with 1.0.0, but also little danger in upgrading.
+        
+        There is one pedantic bugfix which shouldn't affect anyone
+        and small documentation updates as well.
+    
+    commit aa8262b71a207e396cb984a39f1cc917146bcb4b
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jul 8 05:54:25 2010 +0000
+    
+        cleanup "stringio" require
+        
+        "stringio" is part of the Ruby distro and we use it in multiple
+        places, so avoid re-requiring it.
+        (cherry picked from commit 0fea004ab093ec4f59d919915a505a136326bd8a)
+    
+    commit aad1fdfc17e2fe1a6308690daf74456877796f51
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jul 8 05:45:22 2010 +0000
+    
+        tee_input: safer record separator ($/) handling
+        
+        Different threads may change $/ during execution, so cache it at
+        function entry to a local variable for safety.  $/ may also be
+        of a non-binary encoding, so rely on Rack::Utils.bytesize to
+        portably capture the correct size.
+        
+        Our string slicing is always safe from 1.9 encoding: both our
+        socket and backing temporary file are opened in binary mode,
+        so we'll always be dealing with binary strings in this class
+        (in accordance to the Rack spec).
+        (cherry picked from commit 1cd698f8c7938b1f19e9ba091708cb4515187939)
+    
+    commit 6ea71159e2557eca51d2388f07ab552c69a44dd7
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jul 8 05:33:49 2010 +0000
+    
+        prefer "[]" to "first"/"last" where possible
+        
+        "[]" is slightly faster under Ruby 1.9 (but slightly
+        slower under 1.8).
+        (cherry picked from commit 5ece8c1c33f10e6496dfe5ae1d0d368293278d2d)
+    
+    commit 4fa17dfb4adef0945d73e692147a3302b8dd9b74
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jul 8 05:14:55 2010 +0000
+    
+        tee_input: safer record separator ($/) handling
+        
+        Different threads may change $/ during execution, so cache it at
+        function entry to a local variable for safety.  $/ may also be
+        of a non-binary encoding, so rely on Rack::Utils.bytesize to
+        portably capture the correct size.
+        
+        Our string slicing is always safe from 1.9 encoding: both our
+        socket and backing temporary file are opened in binary mode,
+        so we'll always be dealing with binary strings in this class
+        (in accordance to the Rack spec).
+        (cherry picked from commit 1cd698f8c7938b1f19e9ba091708cb4515187939)
+    
+    commit a77c60a372273b24866346482255c4cf21240d60
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 14:17:02 2010 -0700
+    
+        socket_helper: disable documentation
+        
+        (cherry picked from commit 98c51edf8b6f031a655a93b52808c9f9b78fb6fa)
+    
+    commit da0160d1eaf9fda309939253e51d88bb20f03ff4
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 12:59:45 2010 -0700
+    
+        socket_helper: cleanup FreeBSD accf_* detection
+        
+        Instead of detecting at startup if filters may be used, just try
+        anyways and log the error.  It is better to ask for forgiveness
+        than permission :)
+        (cherry picked from commit 2b4b15cf513f66dc7a5aabaae4491c17895c288c)
+    
+    commit 8dbcf5390091b7aedf8c1f76ca11659c13d931b4
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 12:51:24 2010 -0700
+    
+        socket_helper: no reason to check for logger method
+        
+        We only use this module in HttpServer and our unit test mocks
+        it properly.
+        (cherry picked from commit e0ea1e1548a807d152c0ffc175915e98addfe1f2)
+    
+    commit 38b3c521be7715cdbdc406266e351765b2907ac1
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 12:49:48 2010 -0700
+    
+        configurator: cleanup RDoc, un-indent
+        
+        No point in redeclaring the Unicorn module in here.
+        (cherry picked from commit e4d2c7c302e96ee504d82376885ac6b1897c666a)
+    
+    commit a96e19063d5154b87676fa435ca174f545465ec2
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 12:39:36 2010 -0700
+    
+        configurator: documentation for new accept options
+        
+        The defaults should be reasonable, but there may be
+        folks who want to experiment.
+        (cherry picked from commit 686281a90a9b47bac4dfd32a72a97e6e8d26afa1)
+    
+    commit 3673d07250f35e88c9b57ec429a75e5a68f7ca7b
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Tue Jul 6 12:35:45 2010 -0700
+    
+        socket_helper: move defaults to the DEFAULTS constant
+        
+        This is to allow Rainbows! to override the defaults.
+        (cherry picked from commit ef8f888ba1bacc759156f7336d39ba9b947e3f9d)
+    
+    commit 143f466ba0511f3e5a8feaec5d8efd6712829b2c
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Mon Jul 5 23:14:40 2010 +0000
+    
+        doc: recommend absolute paths for -c/--config-file
+        
+        Suggested-by: Jeremy Evans
+        ref: http://mid.gmane.org/AANLkTintT4vHGEdueuG45_RwJqFCToHi5pm2-WKDSUMz@mail.gmail.com
+        (cherry picked from commit d7695c25c5e3b1c90e63bf15a5c5fdf68bfd0c34)
+    
+    commit a88bed858dfa20b5131b631739b340da9dceae99
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Sat Jul 3 09:30:57 2010 +0000
+    
+        socket_helper: tunables for tcp_defer_accept/accept_filter
+        
+        Under Linux, this allows users to tune the time (in seconds) to
+        defer connections before allowing them to be accepted.  The
+        behavior of TCP_DEFER_ACCEPT changed with Linux 2.6.32 and idle
+        connections may still be accept()-ed after the specified value
+        in seconds.  A small value of '1' remains the default for
+        Unicorn as Unicorn does not worry about slow clients.  Higher
+        values provide better DoS protection for Rainbows! but also
+        increases kernel memory usage.
+        
+        Allowing "dataready" for FreeBSD accept filters will allow
+        SSL sockets to be used in the future for HTTPS, too.
+        (cherry picked from commit 646cc762cc9297510102fc094f3af8a5a9e296c7)
+    
+    commit 85d55f6450f3546d3211be247919a2dae03a1110
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Mon Jun 28 04:45:16 2010 +0000
+    
+        http_response: this should be a module, not a class
+        
+        This affects Rainbows!, but Rainbows! is still using the Unicorn
+        1.x branch.  While we're at it, avoid redeclaring the "Unicorn"
+        module, it makes documentation noisier.
+        (cherry picked from commit 5769f313793ca84100f089b1911f2e22d0a31e9d)
+    
+    commit 2b07395f33f321d14c0a252abc37d9e2966f7627
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jun 24 04:31:37 2010 +0000
+    
+        http: avoid (re-)declaring the Unicorn module
+        
+        It makes for messy documentation.
+        (cherry picked from commit b8b979d75519be1c84818f32b83d85f8ec5f6072)
+    
+    commit 0c6e5e165c6422ede694b37646c429595049deb5
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jun 24 04:24:34 2010 +0000
+    
+        tee_input: undent, avoid (re)-declaring "module Unicorn"
+        
+        It makes RDoc look better and cleaner, since we don't
+        do anything in the Unicorn namespace.
+        (cherry picked from commit 6f720afd95d8131a2657c643b97cb18c750ed9f8)
+    
+    commit d187ff43c41881731f5b18bed4312279a54a920c
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jun 24 04:11:35 2010 +0000
+    
+        tee_input: allow tuning of client_body_buffer_size/io_size
+        
+        Some folks may require more fine-grained control of buffering
+        and I/O chunk sizes, so we'll support them (unofficially, for
+        now).
+        (cherry picked from commit 9f48be69bfe579dab02b5fe8d6e728ae63fd24fc)
+    
+    commit 046d57cc8ff071a47a566e33a121b52be363be68
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Thu Jun 24 03:54:40 2010 +0000
+    
+        tee_input: (nitpick) use IO#rewind instead of IO#seek(0)
+        
+        no need to pass an extra argument
+        (cherry picked from commit 1a49a8295054a2e931f5288540acb858be8edcc8)
+    
+    commit 00e04ecc9fda39fa77e2f7fd11834ea977ba9ee8
+    Author: Eric Wong <normalperson@yhbt.net>
+    Date:   Fri Jun 25 11:29:13 2010 -0700
+    
+        test-exec: prefer ENV['PWD'] in working_directory tests
+        
+        We do an extra check in the application dispatch to ensure
+        ENV['PWD'] is set correctly to match Dir.pwd (even if the
+        string path is different) as this is required for Capistrano
+        deployments.
+        
+        These tests should now pass under OSX where /var is apparently
+        a symlink to /private/var.

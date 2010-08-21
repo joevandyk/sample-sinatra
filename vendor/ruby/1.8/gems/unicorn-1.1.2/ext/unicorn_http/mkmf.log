@@ -1,0 +1,44 @@
+have_macro: checking for SIZEOF_OFF_T in ruby.h... -------------------- yes
+
+"gcc -I. -I/usr/local/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -g -O2      -c conftest.c"
+checked program was:
+/* begin */
+1: #include <ruby.h>
+2: /*top*/
+3: #ifndef SIZEOF_OFF_T
+4: # error
+5: >>>>>> SIZEOF_OFF_T undefined <<<<<<
+6: #endif
+/* end */
+
+--------------------
+
+have_macro: checking for SIZEOF_LONG in ruby.h... -------------------- yes
+
+"gcc -I. -I/usr/local/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -g -O2      -c conftest.c"
+checked program was:
+/* begin */
+1: #include <ruby.h>
+2: /*top*/
+3: #ifndef SIZEOF_LONG
+4: # error
+5: >>>>>> SIZEOF_LONG undefined <<<<<<
+6: #endif
+/* end */
+
+--------------------
+
+have_func: checking for rb_str_set_len() in ruby.h... -------------------- yes
+
+"gcc -o conftest -I. -I/usr/local/lib/ruby/1.8/i686-linux -I.  -D_FILE_OFFSET_BITS=64  -g -O2    conftest.c  -L. -L/usr/local/lib -Wl,-R/usr/local/lib -L.  -rdynamic -Wl,-export-dynamic     -lruby-static  -lrt -ldl -lcrypt -lm   -lc"
+checked program was:
+/* begin */
+1: #include <ruby.h>
+2: 
+3: /*top*/
+4: int main() { return 0; }
+5: int t() { void ((*volatile p)()); p = (void ((*)()))rb_str_set_len; return 0; }
+/* end */
+
+--------------------
+

@@ -1,0 +1,5 @@
+$: << File.dirname(__FILE__) + '/../lib'
+require 'example'
+require 'test/unit'
+require 'rack/test'
+ENV['RACK_ENV'] = 'test'
