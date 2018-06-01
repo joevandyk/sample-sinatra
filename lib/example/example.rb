@@ -1,5 +1,5 @@
 module Example
   def self.get_something
-    "Hello Dude!!!"
+    "Hello Dude!!! PID: #{$$} "
   end
 end
