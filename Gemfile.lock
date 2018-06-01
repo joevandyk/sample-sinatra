@@ -1,5 +1,5 @@
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     json (2.1.0)
     kgio (2.11.2)
@@ -31,6 +31,9 @@ DEPENDENCIES
   shotgun
   sinatra
   unicorn
+
+RUBY VERSION
+   ruby 2.5.1p57
 
 BUNDLED WITH
    1.16.1
